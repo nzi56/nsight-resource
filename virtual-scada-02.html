@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebGIS Virtual SCADA – Bangladesh Edition</title>
+    <style>
+        :root {
+            --primary: #005A9E;
+            /* BPDB Blue */
+            --secondary: #FDB813;
+            /* REB Yellow */
+            --success: #28A745;
+            --danger: #DC3545;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --gray: #6C757D;
+            --font: 'Inter', 'Segoe UI', Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            line-height: 1.7;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 90, 158, 0.12);
+            border: 1px solid #e0e6ed;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), #003b73);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--secondary);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .timestamp {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+        }
+
+        .section {
+            padding: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.6rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary);
+            display: inline-block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+            background: #fdfdfd;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fbff;
+        }
+
+        .highlight {
+            background: #fff8e6 !important;
+            font-weight: 600;
+            color: #e67e22;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 0.2rem;
+        }
+
+        .badge-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .badge-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #f7fafc;
+            padding: 1.2rem;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid #4a5568;
+        }
+
+        .demo-box {
+            background: linear-gradient(135deg, #e6f7ff, #f0f9ff);
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .tagline {
+            background: var(--secondary);
+            color: #1a1a1a;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 2rem 0 0;
+            border-top: 4px solid var(--primary);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 2rem;
+        }
+
+        .flag {
+            display: inline-block;
+            width: 1.5em;
+            height: 1em;
+            background: linear-gradient(to bottom, #006a4e 70%, #f42a41 70%);
+            border-radius: 2px;
+            margin-left: 0.5rem;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            table,
+            th,
+            td {
+                font-size: 0.85rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header>
+            <h1>WebGIS Virtual SCADA</h1>
+            <p class="subtitle">GIS-Powered Outage Simulation for Bangladesh Power Distribution</p>
+            <div class="timestamp">
+                Last Updated: November 16, 2025, 09:23 AM +06 <span class="flag"></span>
+            </div>
+        </header>
+
+        <!-- Virtual SCADA Overview -->
+        <div class="section">
+            <h2 class="section-title">How Virtual SCADA Works</h2>
+            <p>This WebGIS application mimics core SCADA functions using <strong>topology-based network tracing</strong>
+                — without any RTUs or sensors.</p>
+            <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+                <li><strong>Upstream/Downstream tracing</strong> from any connection point</li>
+                <li>Isolation zones based on switch/protection device status</li>
+                <li><strong>Blinking animation</strong> for critical layers</li>
+            </ul>
+                    <video controls width="1024" height="450">
+            <source src="videos/transformer-network/transformer-network.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+            <p class="demo-box">80% operational visibility before SCADA — using only GIS data!</p>
+        </div>
+
+        <!-- Outage Simulation Module -->
+        <div class="section">
+            <h2 class="section-title">Outage Simulation & Restoration Assistant ( Fictitious Data )</h2>
+
+            <h3 style="margin: 1.5rem 0 1rem; color: var(--primary);">1. Interactive Outage Creation</h3>
+            <table>
+                <tr>
+                    <th>Action</th>
+                    <th>Bangladesh Example</th>
+                </tr>
+                <tr>
+                    <td>Fault Jumper/Insulator</td>
+                    <td>11kV Rabbit conductor near <strong>Bogra Sadar</strong> → <span
+                            class="badge badge-danger">FAULT</span></td>
+                </tr>
+                <tr>
+                    <td>Open AB Switch</td>
+                    <td>Pole #45, <strong>Gazipur Palli</strong> → <span class="badge badge-warning">OPEN</span></td>
+                </tr>
+                <tr class="highlight">
+                    <td>Monsoon Storm Mode</td>
+                    <td>Sylhet Haor area → 25% random AB switches opened</td>
+                </tr>
+            </table>
+
+            <h3 style="margin: 1.5rem 0 1rem; color: var(--primary);">2. Instant Impact Analysis</h3>
+            <table>
+                <tr>
+                    <th>Output</th>
+                    <th>Visual</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td>De-energized Area</td>
+                    <td>Blinking Red</td>
+                    <td>Khulna Feeder-3 → 1,840 customers</td>
+                </tr>
+                <tr>
+                    <td>Critical Loads</td>
+                    <td>⭐ Icons</td>
+                    <td>Khulna Medical College + 2 BTS sites</td>
+                </tr>
+                <tr class="highlight">
+                    <td>Load Lost</td>
+                    <td>2.1 MW</td>
+                    <td>Five 400 kVA transformers</td>
+                </tr>
+            </table>
+
+            <h3 style="margin: 1.5rem 0 1rem; color: var(--primary);">3. AI Restoration Wizard</h3>
+
+            <div class="code-block">
+
+
+                RESTORATION PLAN (3 Steps, 95% Customers Restored)<br><br>
+                Step 1: Close Tie-Switch TS-08 (Feeder F2 → F3, Kushtia)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;→ Restores 1,400 customers (76%)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;→ F2 Load: 72% → SAFE<br><br>
+                Step 2: Close Backup AB Switch BS-04 (Bogra-2 Substation)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;→ +380 customers (Total 98%)<br><br>
+                Step 3: Isolate Faulted Section (Open AB-12 & AB-13)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;→ Faulted Line: L3-SEG2 (1.2 km, Ambari Road)
+            </div>
+
+            <h3 style="margin: 1.5rem 0 1rem; color: var(--primary);">4. Scenario Comparison</h3>
+            <table>
+                <tr>
+                    <th>Scenario</th>
+                    <th>Customers Off</th>
+                    <th>Duration</th>
+                    <th>Cost (BDT)</th>
+                </tr>
+                <tr>
+                    <td>A: No Action</td>
+                    <td>1,840</td>
+                    <td>4.5 hrs</td>
+                    <td>৳180,000</td>
+                </tr>
+                <tr class="highlight">
+                    <td>B: Optimal Switching</td>
+                    <td>75</td>
+                    <td>2.1 hrs</td>
+                    <td>৳65,000</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Use Cases -->
+        <div class="section">
+            <h2 class="section-title">Real Bangladesh Use Cases</h2>
+            <table>
+                <tr>
+                    <th>Use Case</th>
+                    <th>Location</th>
+                    <th>Impact</th>
+                </tr>
+                <tr>
+                    <td>Market Day Fault</td>
+                    <td>Natore Boro Hat</td>
+                    <td>600 shops → 90% restored in 30 mins</td>
+                </tr>
+                <tr>
+                    <td>Eid Load Shedding</td>
+                    <td>Dhaka DPDC Area-4</td>
+                    <td>Zero-minute shedding via 2 tie-switches</td>
+                </tr>
+                <tr class="highlight">
+                    <td>Flood Isolation</td>
+                    <td>Kurigram Haor</td>
+                    <td>Generator + boat deployment plan</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Demo Script -->
+        <div class="section">
+            <h2 class="section-title">Simulation Plan</h2>
+            <div class="demo-box">
+                <strong>"Watch – a jumper burns in Khulna!"</strong><br>
+                → Click → 1,840 customers go dark! Hospital blinks!<br><br>
+                <strong>"Control room: Restore now!"</strong><br>
+                → Click <span class="badge badge-success">RESTORE</span> → 3-step plan: 1,765 back in minutes<br><br>
+                <strong>Total time: 45 seconds. No SCADA needed.</strong>
+            </div>
+        </div>
+
+        <!-- Tagline -->
+        <div class="tagline">
+            “Restore Power with GIS Before SCADA Arrives — 1 Click, 1 Hour, 100% Control.”
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            Prepared for BPDB, DPDC, DESCO, REB | Contact: <a href="mailto:support@utilitygis.bd"
+                style="color:var(--primary);">support@utilitygis.bd</a>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

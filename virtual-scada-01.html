@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Virtual / Logical SCADA via WebGIS</title>
+  <style>
+    :root {
+      --bg-body: #f4f6fb;
+      --bg-card: #ffffff;
+      --bg-accent: #e5f0ff;
+      --border-soft: #dde3f0;
+      --text-main: #1f2933;
+      --text-muted: #5f6c80;
+      --text-accent: #0b5ed7;
+      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.08);
+      --radius-card: 14px;
+      --radius-pill: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 30px 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .page {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 0 0 12px;
+      font-weight: 650;
+      color: #0f172a;
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      margin-top: 26px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 20px;
+    }
+
+    h4 {
+      font-size: 1.05rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      color: var(--text-accent);
+    }
+
+    p {
+      margin: 0 0 10px;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    .pill-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      background: #e0f2fe;
+      color: #075985;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .pill-label span.dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #0ea5e9;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      padding: 22px 22px 20px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-soft);
+      margin-bottom: 18px;
+    }
+
+    .card-soft {
+      background: #f9fbff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 18px 18px 16px;
+      margin: 12px 0 10px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 800px;
+    }
+
+    .quote-block {
+      border-left: 4px solid var(--text-accent);
+      padding-left: 16px;
+      margin: 16px 0;
+    }
+
+    .quote-title {
+      font-weight: 650;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+      color: #0f172a;
+    }
+
+    .quote-text {
+      font-style: italic;
+      color: var(--text-muted);
+      font-size: 0.96rem;
+    }
+
+    .quote-text strong {
+      color: #0f172a;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--text-muted);
+      font-size: 0.96rem;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .list-heading {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .divider {
+      border: 0;
+      border-top: 1px dashed #cbd5e1;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 4px;
+      font-size: 0.95rem;
+    }
+
+    thead {
+      background: #eff4ff;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      font-weight: 650;
+      color: #0f172a;
+      font-size: 0.9rem;
+    }
+
+    td {
+      color: var(--text-muted);
+    }
+
+    .tagline {
+      font-weight: 600;
+      color: var(--text-accent);
+      font-size: 0.96rem;
+      margin-top: 2px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .section-header small {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pill-note {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      background: #eef2ff;
+      color: #4338ca;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 4px;
+    }
+
+    .one-liner {
+      background: #0f172a;
+      color: #e5e7eb;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-style: italic;
+      font-size: 0.98rem;
+      border: 1px solid #1f2937;
+    }
+
+    .one-liner strong {
+      color: #f9fafb;
+    }
+
+    .highlight {
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .quote-inline {
+      font-style: italic;
+      color: #e5e7eb;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 18px 10px;
+      }
+
+      .card {
+        padding: 18px 16px 16px;
+      }
+
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 10px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        padding: 8px 10px;
+      }
+
+      td {
+        border: none;
+        padding: 4px 6px;
+      }
+
+      td::before {
+        content: attr(data-label);
+        display: block;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 2px;
+        font-size: 0.86rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <!-- Intro card -->
+    <div class="card">
+      <div class="pill-label">
+        <span class="dot"></span>
+        VIRTUAL / LOGICAL SCADA
+      </div>
+
+      <h1>Mimicking Virtual / Logical SCADA Functionality</h1>
+      <p class="subtitle">
+        Our WebGIS-based network tracing application effectively serves as a
+        <span class="highlight">virtual or logical SCADA system</span> by leveraging the
+        geospatial topology of the electrical network to simulate real-time operational awareness—
+        without requiring physical sensors, RTUs, or telemetry infrastructure.
+      </p>
+    </div>
+
+    <!-- Virtual SCADA description -->
+    <div class="card">
+      <div class="section-header">
+        <h2>"Virtual SCADA through GIS Topology Intelligence"</h2>
+        <small>Positioning Statement</small>
+      </div>
+
+      <div class="quote-block">
+        <div class="quote-title">Narrative for Presentations / Proposals / Documentation</div>
+        <p class="quote-text">
+          In the absence of a physical SCADA system, this WebGIS application transforms static network data into a
+          <strong>dynamic, logical SCADA-like control room</strong> directly within the browser. By initiating an
+          <strong>upstream or downstream trace</strong> from any selected connection point—be it a feeder, transformer,
+          switch, or customer meter—the system instantly computes and visualizes the energized electrical path in real
+          time, mimicking SCADA’s core supervisory functions:
+        </p>
+      </div>
+      <h3>Upstream Routing:</h3>
+      <img src="videos/gif/project-gif-002.gif" alt="NRECA International logo" width="1024" height="500">
+
+      <h3>Downstream Network</h3>
+      <img src="videos/gif/project-gif-003.gif" alt="NRECA International logo" width="1024" height="500">
+
+      <ul>
+        <li>
+          <span class="list-heading">Real-time network state inference:</span>
+          Traces respect open/closed states of switches and protection devices (if modeled), simulating isolation zones,
+          fault sections, and supply sources—just like SCADA alarm processing.
+        </li>
+        <li>
+          <span class="list-heading">Dynamic visual alarming via blinking layers:</span>
+          Critical traced elements (e.g., overloaded segments, fault-isolated zones, or de-energized customers) can
+          trigger <strong>blinking animations</strong>, replicating SCADA’s visual alert system for immediate operator
+          attention.
+        </li>
+        <li>
+          <span class="list-heading">Logical telemetry simulation:</span>
+          Instead of polling field devices, the system uses GIS connectivity rules to
+          <em>logically derive</em> power flow direction, affected downstream load, and restoration paths—providing
+          SCADA-equivalent situational awareness using only digital twin data.
+        </li>
+      </ul>
+
+      <div class="card-soft">
+        <p>
+          This creates a <strong>"SCADA before SCADA"</strong> environment—delivering
+          <span class="highlight">80% of operational visibility at 20% of the cost and complexity</span>, using
+          existing GIS assets.
+        </p>
+      </div>
+    </div>
+
+    <!-- Key benefits -->
+    <div class="card">
+      <div class="section-header">
+        <h2>Key Benefits Before Deploying Real SCADA</h2>
+        <small>Why Start with Virtual SCADA?</small>
+      </div>
+
+      <p class="tagline">
+        Use our existing WebGIS to gain SCADA-like visibility long before full SCADA infrastructure is deployed.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Benefit</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Benefit"><strong>Rapid Deployment &amp; Low Cost</strong></td>
+            <td data-label="Description">
+              No hardware (RTUs, sensors, communications) needed.
+              Uses existing GIS data to deliver SCADA-like insights in weeks, not years.
+            </td>
+          </tr>
+          <tr>
+            <td data-label="Benefit"><strong>Operator Training &amp; Muscle Memory</strong></td>
+            <td data-label="Description">
+              Field crews and control room staff train on tracing, isolation, and restoration logic
+              <em>before</em> SCADA exists—reducing errors when the real system goes live.
+            </td>
+          </tr>
+          <tr>
+            <td data-label="Benefit"><strong>Pre-emptive Outage Management</strong></td>
+            <td data-label="Description">
+              Simulate outages by opening switches in GIS → instantly see affected customers, hospitals, or industries →
+              prepare restoration plans proactively.
+            </td>
+          </tr>
+          <tr>
+            <td data-label="Benefit"><strong>Fault Localization Without Sensors</strong></td>
+            <td data-label="Description">
+              Use customer call-ins plus last known switch states → run reverse trace to pinpoint likely fault section
+              (logical sectionalizing).
+            </td>
+          </tr>
+          <tr>
+            <td data-label="Benefit"><strong>Capital Planning &amp; Risk Assessment</strong></td>
+            <td data-label="Description">
+              Identify single points of failure, N-1 contingency risks, or overloaded corridors via repeated trace
+              analysis.
+            </td>
+          </tr>
+          <tr>
+            <td data-label="Benefit"><strong>Stakeholder Communication</strong></td>
+            <td data-label="Description">
+              Share traced network state via web link with regulators, emergency services, or executives during storms
+              or blackouts.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <span class="pill-note">Ideal for utilities on the journey to full SCADA</span>
+    </div>
+
+    <!-- Additional functionalities -->
+    <div class="card">
+      <div class="section-header">
+        <h2>Additional High-Value Functionalities to Enhance "Virtual SCADA"</h2>
+        <small>Roadmap to a Pre-SCADA Operations Platform</small>
+      </div>
+
+      <p class="subtitle">
+        To evolve this from a tracing tool into a <span class="highlight">full pre-SCADA operations platform</span>,
+        consider adding:
+      </p>
+
+      <hr class="divider" />
+
+      <h3>1. Outage Simulation &amp; Restoration Assistant</h3>
+      <ul>
+        <li>Let users "open" a switch or "fault" a line → auto-trace the de-energized zone.</li>
+        <li>Suggest optimal switching sequence to restore non-faulted sections.</li>
+        <li>Estimate customers affected (linked to billing database).</li>
+      </ul>
+
+      <hr class="divider" />
+
+      <h3>2. Load Profile Overlay on Trace Results</h3>
+      <ul>
+        <li>Overlay estimated or historical load (kW) per transformer / feeder.</li>
+        <li>Highlight segments exceeding 80% loading during trace.</li>
+      </ul>
+
+      <hr class="divider" />
+
+      <h3>3. Mobile Field Crew Integration</h3>
+      <ul>
+        <li>Push trace results to field tablets.</li>
+        <li>Crew members tap "I opened this switch" → system updates logical state → re-traces automatically.</li>
+      </ul>
+
+      <hr class="divider" />
+
+      <h3>4. Automated Daily / Storm Reports</h3>
+      <ul>
+        <li>Scheduled traces from all HV feeders → auto-generate PDF or email reports such as:</li>
+        <li>
+          <em>
+            "Feeder X: 1,240 customers, 2 open ties, 1 normally open point"
+          </em>
+        </li>
+      </ul>
+
+      <hr class="divider" />
+
+      <h3>5. Integration with Complaint Management</h3>
+      <ul>
+        <li>Customer calls "no power" → geocode the address → auto-trace upstream.</li>
+        <li>Show probable cause (e.g., "Open switch at Pole 45").</li>
+      </ul>
+
+      <hr class="divider" />
+
+      <h3>6. Protection Coordination Viewer</h3>
+      <ul>
+        <li>During trace, highlight relay / breaker pairs.</li>
+        <li>Flag miscoordination risks (e.g., downstream fuse clearing before upstream breaker).</li>
+      </ul>
+
+      <hr class="divider" />
+
+      <h3>7. Historical Trace Replay</h3>
+      <ul>
+        <li>Store switch operations with timestamps.</li>
+        <li>Replay network state evolution over the past 24 hours (similar to a SCADA event log).</li>
+      </ul>
+
+      <hr class="divider" />
+
+      <h3>8. Integration with AMI Last-Gasp Events</h3>
+      <ul>
+        <li>When AMI meters send "last gasp" (power off), trigger auto-trace from those endpoints.</li>
+        <li>Instantly map outage boundary based on meter events.</li>
+      </ul>
+    </div>
+
+    <!-- One-liner pitch -->
+    <div class="card">
+      <h2>One-Liner Pitch for Management</h2>
+
+      <div class="one-liner">
+        <span class="quote-inline">
+          "<strong>Before investing millions in SCADA</strong>, deploy GIS as your virtual control room—
+          trace faults, train operators, and manage outages today using data you already own."
+        </span>
+      </div>
+
+      <p style="margin-top: 10px;">
+        This positions our WebGIS tool not as a temporary workaround, but as a
+        <span class="highlight">strategic operational bridge</span> to full SCADA maturity.
+      </p>
+    </div>
+
+  </div>
+</body>
+
+</html>
