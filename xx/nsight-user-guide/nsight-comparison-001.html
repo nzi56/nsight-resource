@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nSight as a Virtual / Lightweight SCADA for Distribution Utilities</title>
+    <style>
+        body {font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.7; color: #333; background: #f8fbfd; margin:0;}
+        .container {max-width: 1100px; margin: 0 auto; padding: 40px 20px;}
+        h1 {color: #0055a5; text-align:center; font-size: 2.6rem;}
+        h2 {color: #0055a5; border-bottom: 3px solid #00a0df; padding-bottom: 8px; margin-top: 50px;}
+        table {width: 100%; border-collapse: collapse; margin: 25px 0; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
+        th, td {padding: 14px 16px; text-align: left; border-bottom: 1px solid #ddd;}
+        th {background: #0055a5; color: white;}
+        tr:nth-child(even) {background: #f5fbfd;}
+        .yes {color: #007a00; font-weight: bold;}
+        .partial {color: #e67e00; font-weight: bold;}
+        .no {color: #c0392b; font-weight: bold;}
+        .highlight {background: #e3f2fd; padding: 20px; border-radius: 10px; border-left: 6px solid #00a0df; margin: 30px 0;}
+        ul {padding-left: 20px;}
+        li {margin: 10px 0;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>nSight as a Virtual / Lightweight SCADA for Distribution Utilities</h1>
+    <p style="text-align:center; font-size:1.2rem; color:#555;">
+        How nSight delivers many SCADA-like benefits without requiring a full SCADA system — and where it still falls short.
+    </p>
+
+    <h2>1. How nSight Already Mimics Core SCADA Functions</h2>
+    <div class="highlight">
+        nSight is built on live, continuously updated network connectivity models (GIS + asset database), giving it many capabilities that traditionally only SCADA provides.
+    </div>
+
+    <table>
+        <tr><th>SCADA Core Function</th><th>nSight Capability</th><th>Notes</th></tr>
+        <tr><td>Real-time network topology visualization</td><td class="yes">Yes</td><td>Live connectivity model shows exact open/closed status of switches, sectionalizers, reclosers (if status is maintained in GIS/DB)</td></tr>
+        <tr><td>Upstream / Downstream tracing</td><td class="yes">Yes (instant & animated)</td><td>Faster and more visual than most SCADA single-line diagrams</td></tr>
+        <tr><td>Fault isolation & service restoration logic</td><td class="partial">Partial → Very strong</td><td>Traces de-energized sections instantly; operators use same logic as SCADA crew</td></tr>
+        <tr><td>Outage map & affected customer count</td><td class="yes">Yes (often superior)</td><td>Direct consumer-to-transformer linking gives accurate, real-time customer impact numbers</td></tr>
+        <tr><td>Switching order visualization</td><td class="yes">Yes</td><td>Planned switch states can be simulated on map with full trace preview</td></tr>
+        <tr><td>Historical playback of events</td><td class="partial">Partial</td><td>Possible if status changes are time-stamped in database</td></tr>
+    </table>
+
+    <h2>2. Advantages nSight Has Over Traditional SCADA</h2>
+    <ul>
+        <li><strong>100 % network coverage</strong> – sees every pole, transformer, LV line and consumer; SCADA usually stops at MV feeders</li>
+        <li><strong>Zero blind spots</strong> – no dependency on communication or RTU health</li>
+        <li><strong>Geographic context</strong> – real geography, roads, terrain, landmarks, satellite imagery</li>
+        <li><strong>Mobile-ready</strong> – field crews and managers use same system on tablets/phones</li>
+        <li><strong>Instant statistical reports</strong> – affected customers by tariff, phase, priority, etc.</li>
+        <li><strong>Full asset details</strong> – photos, inspection history, loading data, age, maintenance records at a click</li>
+        <li><strong>No additional hardware/comms infrastructure</strong> – uses existing GIS investment</li>
+        <li><strong>Much lower total cost</strong> – no RTUs, modems, master station upgrades, annual support contracts</li>
+    </ul>
+
+    <h2>3. Important SCADA Features Still Missing in Pure nSight</h2>
+    <table>
+        <tr><th>Feature</th><th>Status in nSight (standard)</th><th>Impact</th></tr>
+        <tr><td>Real-time analog measurements (voltage, current, MW, MVAr)</td><td class="no">Missing</td><td>High – cannot see actual loading or voltage violations in real time</td></tr>
+        <tr><td>Real-time switch/device status from field (telemetry)</td><td class="no">Missing (unless manually updated or integrated)</td><td>High – relies on last-known or manually entered status</td></tr>
+        <tr><td>Remote control of switches</td><td class="no">Not available</td><td>Medium – operators must still use radio/phone</td></tr>
+        <tr><td>Alarm & event list (SOE)</td><td class="no">Not available</td><td>Medium</td></tr>
+        <tr><td>Automatic fault passage indicators (FPI) integration</td><td class="partial">Only if status pushed to GIS</td><td>Medium</td></tr>
+    </table>
+
+    <h2>4. Roadmap: How to Make nSight 80–90 % SCADA-like Without Building a Full SCADA</h2>
+    <div class="highlight">
+        These additions require minimal or no new field hardware and can be implemented in 6–18 months.
+    </div>
+
+    <ol>
+        <li><strong>Live Device Status Integration Layer</strong><br>
+           Create a lightweight “status overlay” table that receives switch/recloser/FPI status via existing AMI head-end, SMS gateways, or low-cost IoT loggers.</li>
+        <li><strong>AMI Last-Gasp & Voltage Alerts</strong><br>
+           Use AMI meters’ last-gasp messages and voltage threshold alarms as pseudo-real-time telemetry (already used by many utilities as “poor-man’s SCADA”).</li>
+        <li><strong>Smart Recloser / Sectionalizer Integration</strong><br>
+           Most modern reclosers can push open/close events via cellular/email/API – ingest these into nSight in < 60 seconds.</li>
+        <li><strong>Real-time Analog Values (optional low-cost)</strong><br>
+           Install μPMUs or smart sensors only on critical feeders (10–20 % of network) → feed values into nSight dashboard.</li>
+        <li><strong>Dynamic Network Coloring Module</strong><br>
+           Color lines and transformers in real time based on:
+           • Energized / de-energized state
+           • Voltage band (from AMI or sensors)
+           • Loading band</li>
+        <li><strong>Alarm Dashboard & Notification Engine</strong><br>
+           Simple event list + email/SMS/WhatsApp alerts for faults, voltage violations, phase loss.</li>
+        <li><strong>Switching Safety Tagging & Lock-out Simulation</strong><br>
+           Digital equivalent of physical tags directly on the map.</li>
+    </ol>
+
+    <h2>Conclusion – Recommended Positioning</h2>
+    <div class="highlight" style="font-size:1.1rem;">
+        <strong>nSight today</strong> → Best-in-class “Virtual SCADA for the 90 % of the network that traditional SCADA never reaches”.<br><br>
+        <strong>nSight + the lightweight integrations above</strong> → A true “Hybrid SCADA-Light” solution that delivers 80–90 % of control-room situational awareness at 20–30 % of traditional SCADA cost.
+    </div>
+
+    <p style="text-align:center; margin-top:50px; font-size:1.1rem; color:#0055a5;">
+        Many mid-size utilities worldwide are already using this exact approach successfully — treating nSight as their primary operational picture and full SCADA only for transmission or a handful of critical substations.
+    </p>
+</div>
+
+</body>
+</html>

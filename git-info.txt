@@ -10,3 +10,11 @@ git push -u origin main
 git remote add origin https://github.com/nislamnreca/nsight-resources.git
 git branch -M main
 git push -u origin main
+----
+echo "# nsight-resource" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/nzi56/nsight-resource.git
+git push -u origin main
